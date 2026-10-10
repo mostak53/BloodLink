@@ -49,7 +49,20 @@ export default function App() {
   // Core Data State
   const [donors, setDonors] = useState<Donor[]>(() => {
     const saved = localStorage.getItem('bloodlink_donors');
-    return saved ? JSON.parse(saved) : INITIAL_DONORS;
+    if (!saved) return INITIAL_DONORS;
+    try {
+      const parsed: Donor[] = JSON.parse(saved);
+      // Keep all custom user-registered donors
+      const userRegistered = parsed.filter(p => !INITIAL_DONORS.some(init => init.id === p.id));
+      // Keep all initial demo donors with any updated reviews/ratings
+      const demoDonorsMerged = INITIAL_DONORS.map(init => {
+        const found = parsed.find(p => p.id === init.id);
+        return found ? { ...init, ...found } : init;
+      });
+      return [...userRegistered, ...demoDonorsMerged];
+    } catch {
+      return INITIAL_DONORS;
+    }
   });
 
   const [requests, setRequests] = useState<BloodRequest[]>(() => {
@@ -245,15 +258,15 @@ export default function App() {
   // Register or Login Donor
   const handleSaveUser = (donor: Donor) => {
     setCurrentUser(donor);
-    // Also add to donors list if not already present
+    // Add to donors list at top and ensure immediate persistence
     setDonors(prev => {
-      const exists = prev.some(d => d.id === donor.id || d.phone === donor.phone);
-      if (exists) {
-        return prev.map(d => (d.id === donor.id || d.phone === donor.phone ? donor : d));
-      }
-      return [donor, ...prev];
+      const remaining = prev.filter(d => d.id !== donor.id && d.phone !== donor.phone);
+      const updated = [donor, ...remaining];
+      localStorage.setItem('bloodlink_donors', JSON.stringify(updated));
+      return updated;
     });
-    setCurrentTab('profile');
+    // Navigate to donors list so user immediately sees their profile listed
+    setCurrentTab('donors');
   };
 
   // Update donor profile from my profile view

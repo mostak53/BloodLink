@@ -30,6 +30,7 @@ export const DonorRegisterLoginModal: React.FC<DonorRegisterLoginModalProps> = (
   const [district, setDistrict] = useState('Dhaka');
   const [subArea, setSubArea] = useState('');
   const [availability, setAvailability] = useState<AvailabilityStatus>('available');
+  const [totalDonations, setTotalDonations] = useState<number>(3);
   const [lastDonationDate, setLastDonationDate] = useState('2026-06-15');
   const [neverDonated, setNeverDonated] = useState(false);
   const [readyForEmergency, setReadyForEmergency] = useState(true);
@@ -41,6 +42,8 @@ export const DonorRegisterLoginModal: React.FC<DonorRegisterLoginModalProps> = (
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim()) return;
+
+    const finalDonationsCount = neverDonated ? 0 : Math.max(0, Number(totalDonations) || 0);
 
     const newDonor: Donor = {
       id: `donor-${Date.now()}`,
@@ -55,13 +58,13 @@ export const DonorRegisterLoginModal: React.FC<DonorRegisterLoginModalProps> = (
       subArea: subArea || 'Downtown',
       availability,
       lastDonationDate: neverDonated ? '2024-01-01' : lastDonationDate,
-      totalDonations: neverDonated ? 0 : 3,
+      totalDonations: finalDonationsCount,
       rating: 5.0,
       reviewCount: 1,
-      verified: true,
-      heroBadge: false,
+      verified: finalDonationsCount >= 3,
+      heroBadge: finalDonationsCount >= 5,
       avatarUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80`,
-      bio: 'Registered volunteer blood donor on Bloodlink.',
+      bio: 'Registered voluntary blood donor on Bloodlink.',
       readyForEmergency,
       age: 26,
       gender: 'Male',
@@ -69,10 +72,12 @@ export const DonorRegisterLoginModal: React.FC<DonorRegisterLoginModalProps> = (
         {
           id: `rev-${Date.now()}`,
           donorId: `donor-${Date.now()}`,
-          reviewerName: 'Bloodlink Verification Team',
+          reviewerName: 'Bloodlink Community',
           rating: 5,
-          date: '2026-10-07',
-          comment: 'Identity and phone number verified successfully. Welcome to Bloodlink!',
+          date: new Date().toISOString().split('T')[0],
+          comment: finalDonationsCount >= 3
+            ? 'Verified Donor! Successfully completed 3+ blood donations.'
+            : 'Welcome to Bloodlink! Profile registered successfully.',
           bloodTypeProvided: bloodType,
         }
       ]
@@ -293,6 +298,34 @@ export const DonorRegisterLoginModal: React.FC<DonorRegisterLoginModalProps> = (
                     required
                   />
                 </div>
+              </div>
+
+              {/* Total Successful Donations */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    {language === 'bn' ? 'মোট সফল রক্তদানের সংখ্যা' : 'Total Successful Blood Donations'} *
+                  </label>
+                  <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400">
+                    {Number(totalDonations) >= 3 ? '✓ Verified Badge' : `${totalDonations}/3 for Verified`}
+                  </span>
+                </div>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={neverDonated ? 0 : totalDonations}
+                  disabled={neverDonated}
+                  onChange={(e) => setTotalDonations(Math.max(0, parseInt(e.target.value) || 0))}
+                  placeholder="3"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-800 dark:text-slate-200 disabled:opacity-50"
+                  required
+                />
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  {language === 'bn'
+                    ? '৩ বা ততোধিক বার রক্তদান সম্পন্ন হলে আপনার প্রোফাইলে স্বয়ংক্রিয়ভাবে "যাচাইকৃত রক্তদাতা" ব্যাজ যুক্ত হবে।'
+                    : 'Donors with 3 or more completed donations automatically earn the official Verified Donor badge.'}
+                </p>
               </div>
 
               {/* Last Donation Date (Countdown Basis) */}
