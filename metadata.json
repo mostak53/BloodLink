@@ -1,0 +1,7 @@
+{
+  "name": "Bloodlink",
+  "description": "An innovation platform connecting blood donors directly with patients featuring urgent requests, direct chat, phone & WhatsApp contact, countdown tracking, and AI assistance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
