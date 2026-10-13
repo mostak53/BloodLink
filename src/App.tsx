@@ -17,6 +17,7 @@ import { EmergencyRequestFeed } from './components/EmergencyRequestFeed';
 import { EmergencyRequestModal } from './components/EmergencyRequestModal';
 import { DonorRegisterLoginModal } from './components/DonorRegisterLoginModal';
 import { DonorProfileModal } from './components/DonorProfileModal';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { MyProfileView } from './components/MyProfileView';
 import { ChatDrawer } from './components/ChatDrawer';
 import { RatingModal } from './components/RatingModal';
@@ -276,7 +277,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen flex flex-col font-sans selection:bg-rose-500 selection:text-white pb-20 md:pb-0">
       
       {/* 1. Header Navigation */}
       <Navbar
@@ -506,6 +507,18 @@ export default function App() {
         onSimulateUrgentAlert={handleSimulateUrgentAlert}
         soundEnabled={soundEnabled}
         setSoundEnabled={setSoundEnabled}
+      />
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
+        language={language}
+        currentUser={currentUser}
+        onOpenNewRequest={() => setIsRequestModalOpen(true)}
+        onOpenRegister={() => setIsRegisterLoginModalOpen(true)}
+        urgentRequestsCount={requests.filter(r => r.requestType === 'emergency' && r.status === 'open').length}
+        unreadNotificationsCount={notifications.filter(n => !n.read).length}
       />
 
     </div>
