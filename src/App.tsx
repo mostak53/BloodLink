@@ -277,7 +277,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-rose-500 selection:text-white pb-20 md:pb-0">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col font-sans selection:bg-rose-500 selection:text-white pb-20 md:pb-0">
       
       {/* 1. Header Navigation */}
       <Navbar
